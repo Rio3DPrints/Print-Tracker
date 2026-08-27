@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rio3D - Order Tracker</title>
+    <style>
+        :root {
+            --bg-primary: #f0f4f8;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #e2e8f0;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.05), 0 8px 10px -6px rgba(59, 130, 246, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--bg-card);
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        button {
+            background: var(--bg-primary);
+            border: none;
+            color: var(--text-main);
+            padding: 0.75rem 1.25rem;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        button:hover {
+            background: var(--border);
+        }
+
+        button.primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        button.primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .card.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-muted);
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg-primary);
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            border-color: var(--accent);
+        }
+
+        .catalog-reference {
+            background: var(--bg-primary);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .catalog-reference b {
+            color: var(--text-main);
+        }
+
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .order-item {
+            background: var(--bg-primary);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-info h4 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .order-info p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .order-qty {
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🖨️ Rio3D</h1>
+        <div class="nav-btns">
+            <button onclick="switchView('add')" class="primary">➕ New Order</button>
+            <button onclick="switchView('list')">📦 Orders (<span id="orderCount">0</span>)</button>
+        </div>
+    </header>
+
+    <!-- STEP 1: ITEM SELECTION -->
+    <div id="view-add" class="card active">
+        <h2>✨ Add New 3D Print Order</h2>
+        <div class="catalog-reference">
+            <b>Item Catalog:</b><br>
+            1: Egg Clicker | 2: Cheese Clicker | 3: Butter Clicker | 4: Star Clicker<br>
+            5: Solid Slime Small | 6: Solid Slime Big | 7: Hexegon
+        </div>
+        <div class="form-group">
+            <label for="itemSelect">Select Item ID</label>
+            <select id="itemSelect" onchange="updateColorOptions()">
+                <option value="1">1 - Egg Clicker 🥚</option>
+                <option value="2">2 - Cheese Clicker 🧀</option>
+                <option value="3">3 - Butter Clicker 🧈</option>
+                <option value="4">4 - Star Clicker ⭐</option>
+                <option value="5">5 - Solid Slime Small 🟢</option>
+                <option value="6">6 - Solid Slime Big 🟢</option>
+                <option value="7">7 - Hexegon ⬡</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="colorSelect">Select Color</label>
+            <select id="colorSelect">
+                <!-- Populated dynamically via JS -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="quantityInput">Quantity</label>
+            <input type="number" id="quantityInput" value="1" min="1">
+        </div>
+        <button onclick="saveOrder()" class="primary" style="width: 100%; justify-content: center;">✅ Done & Add to Orders</button>
+    </div>
+
+    <!-- STEP 2: ORDERS PAGE -->
+    <div id="view-list" class="card">
+        <h2>📦 Active Orders</h2>
+        <div id="orderListContainer" class="order-list">
+            <div class="empty-state">No orders logged yet! Click "New Order" to start. 🚀</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const items = {
+        1: { name: "Egg Clicker", emoji: "🥚", colors: ["White"] },
+        2: { name: "Cheese Clicker", emoji: "🧀", colors: ["Yellow"] },
+        3: { name: "Butter Clicker", emoji: "🧈", colors: ["Yellow", "Pink"] },
+        4: { name: "Star Clicker", emoji: "⭐", colors: ["Gold", "Pink"] },
+        5: { name: "Solid Slime Small", emoji: "🟢", colors: ["Green", "Pink", "Yellow", "Black", "White", "Gold"] },
+        6: { name: "Solid Slime Big", emoji: "🟢", colors: ["Green", "Pink", "Yellow", "Black", "White", "Gold"] },
+        7: { name: "Hexegon", emoji: "⬡", colors: ["Green", "Pink", "Yellow", "Black", "White", "Gold"] }
+    };
+
+    let orders = [];
+
+    function updateColorOptions() {
+        const itemId = document.getElementById('itemSelect').value;
+        const colorSelect = document.getElementById('colorSelect');
+        const availableColors = items[itemId].colors;
+        
+        colorSelect.innerHTML = '';
+        availableColors.forEach(color => {
+            const option = document.createElement('option');
+            option.value = color;
+            option.textContent = color;
+            colorSelect.appendChild(option);
+        });
+    }
+
+    function switchView(viewName) {
+        document.getElementById('view-add').classList.remove('active');
+        document.getElementById('view-list').classList.remove('active');
+        
+        if(viewName === 'add') {
+            document.getElementById('view-add').classList.add('active');
+        } else {
+            document.getElementById('view-list').classList.add('active');
+            renderOrders();
+        }
+    }
+
+    function saveOrder() {
+        const itemId = document.getElementById('itemSelect').value;
+        const color = document.getElementById('colorSelect').value;
+        const quantity = document.getElementById('quantityInput').value;
+
+        const order = {
+            name: items[itemId].name,
+            emoji: items[itemId].emoji,
+            color: color,
+            quantity: quantity
+        };
+
+        orders.push(order);
+        document.getElementById('orderCount').textContent = orders.length;
+        
+        // Reset and switch to list
+        document.getElementById('quantityInput').value = 1;
+        switchView('list');
+    }
+
+    function renderOrders() {
+        const container = document.getElementById('orderListContainer');
+        if(orders.length === 0) {
+            container.innerHTML = `<div class="empty-state">No orders logged yet! Click "New Order" to start. 🚀</div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+        orders.forEach((order, index) => {
+            container.innerHTML += `
+                <div class="order-item">
+                    <div class="order-info">
+                        <h4>${order.emoji} ${order.name}</h4>
+                        <p>Color: <b>${order.color}</b></p>
+                    </div>
+                    <div class="order-qty">x${order.quantity}</div>
+                </div>
+            `;
+        });
+    }
+
+    // Initialize color options on load
+    updateColorOptions();
+</script>
+
+</body>
+</html>
